@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>32-惰性模式</title>
+</head>
+
+<body>
+       
+    <script>
+        //封装绑定事件 加载即执行
+        var addEvent = (function (dom,type,fn){
+            if(dom.addEventListener){
+                return function(dom,type,fn){
+                    dom.addEventListener(type,fn,false);
+                }
+            } else if(dom.attachEvent){
+                return function(dom,type,fn){
+                    dom.attachEvent(`on${type}`,fn);
+                }
+            } else {
+                return function(dom,type,fn){
+                    dom[`on${type}`] = fn;
+                }
+            }
+        })();
+        //封装绑定事件 第一次调用执行
+        var addEvent = function (dom,type,fn){
+            if(dom.addEventListener){
+                addEvent = function(dom,type,fn){
+                    dom.addEventListener(type,fn,false);
+                }
+            } else if(dom.attachEvent){
+                addEvent = function(dom,type,fn){
+                    dom.attachEvent(`on${type}`,fn);
+                }
+            } else {
+                addEvent = function(dom,type,fn){
+                    dom[`on${type}`] = fn;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

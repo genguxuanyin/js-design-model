@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>37-模板引擎模式</title>
+</head>
+
+<body>
+    <div id="test">
+
+    </div>
+    <script type="text/template" id="demo_script">
+        <div id="tag_cloud">
+            {% for(var i=0,len=tagCloud.length;i<len;i++){
+                var ctx = tagCloud[i];%}
+                <a href="#" class="tag_item
+                {% if(ctx["is_selected"]){ %}
+                    selected
+                {% } %}
+                " title="{%=ctx["title"]%}">{%=ctx["text"]%}</a>
+            {% } %}
+        </div>
+    </script>
+    <script>
+        var F = F || {};
+        F.define = function(str,fn){
+            var parts = str.split('.'),
+                old = parent = this,
+                i = len = 0;
+            if(parts[0] === F){
+                parts = parts.slice(1);
+            }
+            if(parts[0] === 'define' || parts[0] === 'module'){
+                return;
+            }
+            for(len=parts.length;i<len;i++){
+                if(typeof parent[parts[i]] === 'undefined'){
+                    parent[parts[i]] = {};
+                }
+                old = parent;
+                parent = parent[parts[i]];
+            }
+            if(fn){
+                old[parts[--i]] = fn();
+            }
+            return this;
+        }
+
+        F.module = function(){
+            var args = [].slice.call(arguments),
+                fn = args.pop(),
+                parts = args[0] && args[0] instanceof Array ? args[0] : args,
+                modules = [],
+                modIDs = '',
+                i = 0,
+                ilen = parts.length,
+                parent,
+                j,
+                jlen;
+            while(i < ilen){
+                if(typeof parts[i] === 'string'){
+                    parent = this;
+                    modIDs = parts[i].replace(/^F\./,'').split('.');
+                    for(j=0,jlen = modIDs.length;j<jlen;j++){
+                        parent = parent[modIDs[j]] || false;
+                    }
+                    modules.push(parent);
+                } else {
+                    modules.push(parts[i]);
+                }
+                i++;
+            }
+            fn.apply(null,modules);
+        }
+        F.define('lib/dom',function(){
+            var $ = function(id){
+                $.dom = document.getElementById(id);
+                return $;
+            }
+            $.html = function(html){
+                if(html){
+                    this.dom.innerHTML = html;
+                    return this;
+                } else {
+                    return this.dom.innerHTML;
+                }
+            }
+            return $;
+        });
+        F.define('lib/template',function(){
+            var _TplEngine = function(str,data){
+                if(data instanceof Array){
+                    var html = '',
+                        i = 0,
+                        len = data.length;
+                    for(;i<len;i++){
+                        html += _getTpl(str)(data[i]);
+                    }
+                    return html;
+                }
+                return _getTpl(str)(data);
+            },
+            _getTpl = function(str){
+                var ele = document.getElementById(str);
+                if(ele){
+                    var html = /^(textarea|input)$/i.test(ele.nodeName)?ele.value:ele.innerHTML;
+                    return _compileTpl(html);
+                }
+                return _compileTpl(str);
+            },
+            _dealTpl = function(str){
+                var _left = '{%',
+                    _right = '%}';
+                var a = new String(str)
+                    .replace(/&lt;/g,'<')
+                    .replace(/&gt;/g,'>')
+                    .replace(/[\r\t\n]+/g,''),
+                b = a.replace(new RegExp(_left + '=(.*?)'+_right,'g'),"',typeof($1)==='undefined'?'':$1,'"),
+                c = b.replace(new RegExp(_left,'g'),"');"),
+                d = c.replace(new RegExp(_right,'g'),"template_array.push('");
+                return d;   
+            },
+            _compileTpl = function(str){
+                var fnBody = "var template_array = [];\nvar fn = (function(data){\nvar template_key='';\nfor(var key in data){\ntemplate_key+=('var '+key+'=data[\"'+key+'\"];');\n}\neval(template_key);\ntemplate_array.push('"+_dealTpl(str)+"');\ntemplate_key = null;\n})(templateData);\nfn=null;\nreturn template_array.join('');"
+                return new Function("templateData",fnBody);
+            };
+            return _TplEngine;
+        })
+        var data = {
+            tagCloud:[
+                {is_selected:true,title:'这是一本设计模式书',text:'设计模式'},
+                {is_selected:false,title:'这是一本设计HTML书',text:'HTML'},
+                {is_selected:null,title:'这是一本设计CSS书',text:'CSS'},
+                {is_selected:'',title:'这是一本设计JS书',text:'JS'},
+            ]
+        }
+        F.module(['lib/template','lib/dom'],function(template,dom){
+            var str = template('demo_script',data);
+            dom('test').html(str);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>8-单例模式</title>
+    <style lang="css">
+        .d{
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="d"></div>
+    <script>
+        //封装绑定事件
+        function addEvent(dom,type,fn){
+            if(dom.addEventListener){
+                dom.addEventListener(type,fn,false);
+            } else if(dom.attachEvent){
+                dom.attachEvent(`on${type}`,fn);
+            } else {
+                dom[`on${type}`] = fn;
+            }
+        }
+
+        //获取事件对象
+        var getEvent = function(event){
+            return event || window.event;
+        }
+        //获取元素
+        var getTarget = function(event){
+            var event = getEvent(event);
+            return event.target || event.srcElement;
+        }
+        //阻止默认行为
+        var preventDefault = function(event){
+            var event = getEvent(event);
+            if(event.preventDefault){
+                event.preventDefault();
+            } else {
+                event.returnValue = false;
+            }
+        }
+        
+        var dom = document.getElementsByClassName('d')[0];
+        addEvent(dom,'click',function(){
+            console.log(1);
+        });
+        addEvent(dom,'click',function(){
+            console.log(2);
+        });
+    </script>
+</body>
+</html>

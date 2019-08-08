@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>24-备忘录模式</title>
+</head>
+<body>
+    <script>
+        //缓存
+        var Page = (function(){
+            var cache = {};
+            return function(page,fn){
+                if(cache[page]){
+                    fn && fn(cache[page]);
+                } else {
+                    $.post(url,{page:page},function(res){
+                        if(res.state === 1){
+                            cache[page] = res.data;
+                            fn && fn(res.data);
+                        } else {
+
+                        }
+                    })
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

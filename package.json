@@ -1,0 +1,26 @@
+{
+  "name": "js-design-mode",
+  "version": "1.0.0",
+  "description": "JavaScript设计模式 整理笔记",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/genguxuanyin/js-design-model.git"
+  },
+  "keywords": [
+    "js",
+    "javascript",
+    "design",
+    "mode",
+    "patterns"
+  ],
+  "author": "genguxuanyin@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/genguxuanyin/js-design-model/issues"
+  },
+  "homepage": "https://github.com/genguxuanyin/js-design-model#readme"
+}

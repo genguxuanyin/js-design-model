@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>5-抽象工厂模式</title>
+</head>
+<body>
+    <script>
+        var VehicleFactory = function(subType,superType){
+            if(typeof VehicleFactory[superType] === 'function'){
+                // inherit
+                function F(){}
+                F.prototype = new VehicleFactory[superType]();
+                subType.constructor = subType;
+                subType.prototype = new F();
+            } else {
+                throw new Error('未创建该抽象类');
+            }
+        }
+        VehicleFactory.Car = function(){
+            this.type = 'car';
+        }
+        Object.assign(VehicleFactory.Car.prototype,{
+            getPrice(){
+                throw new Error('抽象方法不能调用');
+            }
+        });
+
+        var BWM = function(price,speed){
+            this.price = price;
+            this.speed = speed;
+        }
+        VehicleFactory(BWM,'Car');
+        Object.assign(BWM.prototype,{
+            /* getPrice(){
+                return this.price;
+            }, */
+            getSpeed(){
+                return this.speed;
+            }
+        });
+        var bwm = new BWM(1,2);
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>4-工厂方法模式</title>
+</head>
+<body>
+    <script>
+        //安全模式类
+        var Demo = function(){
+            var that = Object.create(Demo.prototype);
+            if(!(this instanceof Demo)){
+                return new Demo();
+            }
+        }
+        var d1 = Demo();
+        var d2 = new Demo();
+    </script>
+    <script>
+        //安全的工厂方法
+        var Factory = function(type,content){
+            if(this instanceof Factory){
+                return new this[type](content);
+            } else {
+                return new Factory(type,content);
+            }
+        }
+
+        Object.assign(Factory.prototype,{
+            Java:function(content){
+                this.content = content;
+            },
+            php(){//ES6的Method写法和一般的函数不一样，不能作为构造函数来使用，应如Java
+
+            }
+        });
+        new Factory('Java','Java123')
+
+        console.log(Object.getOwnPropertyNames(Factory.prototype.Java));
+        console.log(Factory.prototype.Java.prototype);
+
+        console.log(Object.getOwnPropertyNames(Factory.prototype.php));
+        console.log(Factory.prototype.php.prototype);
+
+    </script>
+</body>
+</html>

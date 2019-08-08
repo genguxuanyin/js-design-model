@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>39-MVP模式</title>
+</head>
+
+<body>
+    <script>
+        ~(function(w){
+            var MVP = function(){};
+            MVP.model = function(){
+                var M = {};
+                M.data = {
+                    nav:[
+                        {
+                            text:'新闻头条',
+                            mode:'news',
+                            url:'01.jpg'
+                        },
+                        {
+                            text:'最新电影',
+                            mode:'movie',
+                            url:'02.jpg'
+                        },
+                        {
+                            text:'热门游戏',
+                            mode:'game',
+                            url:'03.jpg'
+                        },
+                        {
+                            text:'今日特价',
+                            mode:'price',
+                            url:'04.jpg'
+                        },
+                    ]
+                };
+                M.conf = {};
+                return {
+                    getData(m){
+                        return M.data[m];
+                    },
+                    setData(m,v){
+                        M.data[m] = v;
+                        return v;
+                    },
+                    getConf(c){
+                        return M.conf[c];
+                    },
+                    setConf(c,v){
+                        M.conf[c] = v;
+                        return v;
+                    }
+                }
+            }();
+            MVP.view = function(){
+                var REPLACEKEY = '__REPLACEKEY__';
+                function getHTML(str,replacePos){
+                    //未写 见 P291
+                }
+                function eachArray(arr,fn){
+                    for(var i=0;i<arr.length;i++){
+                        fn(i,arr[i],len);
+                    }
+                }
+                function formateItem(str,rep){
+                    return str.replace(new RegExp(REPLACEKEY,'g'),rep);
+                }
+                return function(srt){
+                    var part = str
+                    .replace(/^\s+|\s+$/,'')
+                    .replace(/\s+(>)\s+/g,'$1')
+                    .split('>'),
+                    html = REPLACEKEY,
+                    item,
+                    nodeTpl;
+                    eachArray(part,function(partIndex,partValue,partLen){
+                        item = partValue.split('+');
+                        nodeTpl = REPLACEKEY;
+                        eachArray(item,function(itemIndex,itemValue,itemLen){
+                            nodeTpl = formateItem(nodeTpl,getHTML(itemValue,itemIndex === itemLen-1?(partIndex===partLen-1?'':'in'):'add'));
+                        });
+                        html = formateItem(html,nodeTpl);
+                    });
+                    return html;
+                }
+            }();
+            MVP.presenter = function(){
+                function formateString(str,obj){
+                    return str.replace(/\{#(\w+)#\}/g,function($,$1){
+                        console.log(arguments);
+                        return obj[$1];
+                    });
+                }
+                var V = MVP.view;
+                var M = MVP.model;
+                var C = {
+                    nav(M,V){
+                        var data = M.getData('nav');
+                        data[0].choose = 'choose';
+                        data[data.length-1].last = 'last';
+                        var tpl = V('li.@mode @choose @last[data-mode=@mode]>a#nav_@mode.nav-@mode[href=@url title=@text]>i.nav-icon-@mode+span{@text}');
+                        $.create('ul',{
+                            'class':'navigation',
+                            'id':'nav'
+                        })
+                        .html(A.formateString(tpl,data))
+                        .appendTo('#container');
+                    }
+                };
+                return {
+                    init(){
+                        for(var i in C){
+                            C[i] && C[i](M,V,i);
+                        }
+                    },
+                    add(modName,pst){
+                        C[modName] = pst;
+                        return this;
+                    }
+                }
+            }();
+            MVP.init = function(){
+                this.presenter.init();
+            };
+            w.MVP = MVP;
+        })(window);
+    </script>
+    <script>
+        window.onload = function(){
+            MVP.init();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>34-同步模块模式</title>
+</head>
+
+<body>
+    <div id="test">
+        123
+    </div>
+    <script>
+      var F = F || {};
+      F.define = function(str,fn){
+        var parts = str.split('.'),
+            old = parent = this,
+            i = len = 0;
+        if(parts[0] === F){
+            parts = parts.slice(1);
+        }
+        if(parts[0] === 'define' || parts[0] === 'module'){
+            return;
+        }
+        for(len=parts.length;i<len;i++){
+            if(typeof parent[parts[i]] === 'undefined'){
+                parent[parts[i]] = {};
+            }
+            old = parent;
+            parent = parent[parts[i]];
+        }
+        if(fn){
+            old[parts[--i]] = fn();
+        }
+        return this;
+      }
+
+      F.module = function(){
+        var args = [].slice.call(arguments),
+            fn = args.pop(),
+            parts = args[0] && args[0] instanceof Array ? args[0] : args,
+            modules = [],
+            modIDs = '',
+            i = 0,
+            ilen = parts.length,
+            parent,
+            j,
+            jlen;
+        while(i < ilen){
+            if(typeof parts[i] === 'string'){
+                parent = this;
+                modIDs = parts[i].replace(/^F\./,'').split('.');
+                for(j=0,jlen = modIDs.length;j<jlen;j++){
+                    parent = parent[modIDs[j]] || false;
+                }
+                modules.push(parent);
+            } else {
+                modules.push(parts[i]);
+            }
+            i++;
+        }
+        fn.apply(null,modules);
+      }
+
+      F.define('dom',function(){
+          var $ = function(id){
+              $.dom = document.getElementById(id);
+              return $;
+          }
+          $.html = function(html){
+              if(html){
+                  this.dom.innerHTML = html;
+                  return this;
+              } else {
+                  return this.dom.innerHTML;
+              }
+          }
+          return $;
+      });
+
+      F.module(['dom',document],function(){
+          console.log(arguments);
+      });
+
+      F.define('string',function(){
+          return {
+              trim:function(str){
+                return str.replace(/^\s+|\s+$/g,'');
+              }
+          }
+      });
+
+      F.module('dom','string.trim',function(){
+          console.log(arguments);
+      })
+      console.log(F.string.trim(' ab  '));
+
+      
+
+      F.dom('test').html();
+    </script>
+</body>
+</html>

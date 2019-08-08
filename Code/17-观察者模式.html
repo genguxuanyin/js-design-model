@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>17-观察者模式</title>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <span>消息数量:</span>
+            <span id="msg_num">
+                0
+            </span>
+        </div>
+        <div>
+            <span>
+                消息列表：
+            </span>
+            <ul id="msg">
+    
+            </ul>
+        </div>
+        <div>
+            <textarea name="" id="user_input" cols="30" rows="10"></textarea>
+            <input type="button" id='user_submit' value="Submit">
+        </div>
+    </div>
+    <script>
+        //封装绑定事件
+        function addEvent(dom,type,fn){
+            if(dom.addEventListener){
+                dom.addEventListener(type,fn,false);
+            } else if(dom.attachEvent){
+                dom.attachEvent(`on${type}`,fn);
+            } else {
+                dom[`on${type}`] = fn;
+            }
+        }
+       var Observer = (function(){
+           var __messages = {};
+           return {
+               regist:function(type,fn){
+                if(typeof __messages[type] === 'undefined'){
+                    __messages[type] = [fn];
+                } else {
+                    __messages[type].push(fn);
+                }
+                return this;
+               },
+               fire: function(type, args){
+                if(!__messages[type])return;
+                var events = {
+                    type:type,
+                    args:args || {}
+                },
+                i = 0,
+                len = __messages[type].length;
+                for(;i<len;i++){
+                    console.log(this);
+                    __messages[type][i].call(this,events);
+                }
+                return this;
+               },
+               remove: function(type,fn){
+                if(__messages[type] instanceof Array){
+                    var i = __messages[type].length - 1;
+                    for(;i>=0;i--){
+                        __messages[type][i] === fn && __messages[type].splice(i,1)
+                    }
+                }
+                return this;
+               }
+           }
+       })();
+       /* Observer.regist('test',function(e){
+           console.log(e.type,e.args.msg);
+       });
+       Observer.fire('test',{msg:'参数'}) */
+       function $(id){
+           return document.getElementById(id);
+       }
+
+       (function(){
+        function addMsgItem(e){
+            var text = e.args.text,
+            ul = $('msg'),
+            li = document.createElement('li'),
+            span = document.createElement('span');
+            li.innerHTML = text;
+            span.innerHTML = 'X';
+            addEvent(span,'click',function(){
+                ul.removeChild(li);
+                Observer.fire('removeCommentMessage',{
+                    num:-1
+                })
+            })
+            li.appendChild(span);
+            ul.appendChild(li);
+        }
+        Observer.regist('addCommentMessage',addMsgItem);
+       })();
+
+       (function(){
+           function changeMsgNum(e){
+            var num = e.args.num;
+            $('msg_num').innerHTML = parseInt($('msg_num').innerHTML) + num;
+           }
+           Observer
+            .regist('addCommentMessage',changeMsgNum)
+            .regist('removeCommentMessage',changeMsgNum)
+       })();
+
+       (function(){
+           addEvent($('user_submit'),'click',function(){
+            var text = $('user_input');
+            if(text.value === ''){
+                return;
+            } else {
+                Observer.fire('addCommentMessage',{
+                    text:text.value,
+                    num:1
+                })
+                text.value = '';
+            }
+           });
+       })();
+    </script>
+</body>
+</html>

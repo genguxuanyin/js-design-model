@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>8-单例模式</title>
+</head>
+<body>
+    <script>
+       function Resource() {
+        // 如果不是第一次new（instance肯定是存在的）
+        if (Resource.instance)
+            return Resource.instance;
+        else { // 否则（instance不存在）
+            // 组装新对象
+            this.balance = 100;
+
+            // 将其存到Resource机器上
+            Resource.instance = this;
+        }
+    }
+
+    var r = new Resource();
+
+    console.log('r:', r)
+    r.balance = 50;
+    console.log('r:', r)
+
+    var r2 = new Resource();
+
+    console.log('r2:', r2);
+
+    r.balance = 55;
+
+    console.log('r2:', r2);
+    </script>
+</body>
+</html>

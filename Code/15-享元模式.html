@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>15-享元模式</title>
+</head>
+<body>
+    <div id="container"></div>
+    <a href="" id="next_page">下一页</a>
+    <script>
+        //封装绑定事件
+        function addEvent(dom,type,fn){
+            if(dom.addEventListener){
+                dom.addEventListener(type,fn,false);
+            } else if(dom.attachEvent){
+                dom.attachEvent(`on${type}`,fn);
+            } else {
+                dom[`on${type}`] = fn;
+            }
+        }
+
+        //获取事件对象
+        var getEvent = function(event){
+            return event || window.event;
+        }
+        //获取元素
+        var getTarget = function(event){
+            var event = getEvent(event);
+            return event.target || event.srcElement;
+        }
+        //阻止默认行为
+        var preventDefault = function(event){
+            var event = getEvent(event);
+            if(event.preventDefault){
+                event.preventDefault();
+            } else {
+                event.returnValue = false;
+            }
+        }
+
+        var Flyweight = (function(){
+            var created = [];
+            function create(){
+                var dom = document.createElement('div');
+                document.getElementById('container').appendChild(dom);
+                created.push(dom);
+                return dom;
+            }
+            return {
+                getDiv:function(){
+                    if(created.length<5){
+                        return create();
+                    } else {
+                        var div = created.shift();
+                        created.push(div);
+                        return div;
+                    }
+                }
+            }
+        })();
+        var article = ['第一条新闻','第二条新闻','第三条新闻','第四条新闻','第五条新闻','第六条新闻','第七条新闻','第八条新闻','第九条新闻'];
+        var paper = 0,
+            num = 5,
+            len = article.length;
+        for(var i=0;i<5;i++){
+            if(article[i]){
+                Flyweight.getDiv().innerHTML = article[i];
+            }
+        }
+        addEvent(document.getElementById('next_page'),'click',function(event){
+            preventDefault(event);
+            if(article.length<5)return;
+            var n = ++paper * num % len,
+            j = 0;
+            for(;j<5;j++){
+                if(article[n + j]){
+                    Flyweight.getDiv().innerHTML = article[n + j];
+                } else if(article[n + j - len]){
+                    Flyweight.getDiv().innerHTML = article[n + j - len];
+                } else {
+                    Flyweight.getDiv().innerHTML = '';
+                }
+            }
+            });
+    </script>
+</body>
+</html>

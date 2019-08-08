@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>25-迭代器模式</title>
+</head>
+<body>
+    <script>
+        Object.assign(Array.prototype,{
+            _iteratorIndex:0,
+            first(){
+                this._iteratorIndex = 0;
+                return this[this._iteratorIndex];
+            },
+            last(){
+                this._iteratorIndex = this.length - 1;
+                return this[this._iteratorIndex];
+            },
+            pre(){
+                if(--this._iteratorIndex > 0){
+                    return this[this._iteratorIndex];
+                } else {
+                    this._iteratorIndex = 0;
+                    return null;
+                }
+            },
+            next(){
+                if(++this._iteratorIndex < this.length){
+                    return this[this._iteratorIndex];
+                } else {
+                    this._iteratorIndex = this.length - 1;
+                    return null;
+                }
+            },
+            get(num){
+                this._iteratorIndex = num >= 0 ? num % this.length:num % this.length + length
+                return this[this._iteratorIndex];
+            },
+            dealEach(fn){
+                var args = this.splice.call(arguments,1);
+                for(var i=0;i<this.length;i++){
+                    fn.apply(this,[i,...args]);
+                }
+            },
+            dealItem(num,fn){
+                var args = this.splice.call(arguments,2);
+                fn.apply(this,[num,...args]);
+            },
+            exclusive(){
+
+            }
+        });
+        var a = [1,2,3];
+        a.dealEach(function(i,...args){
+            console.log(i,args)
+        },'t1','t2');
+    </script>
+    <script type="text">
+        var arr = [1,2,3,4,5];
+        //模拟 原生forEach return false中止循环
+        var eachArray = function(arr,fn){
+            for(let i=0;i<arr.length;i++){
+                if(fn.call(arr[i],arr[i],i)===false){
+                    break;
+                }
+            }
+        }
+        eachArray(arr,function(index,value){
+            console.log(value);
+            if(value == 3){
+                return false;
+            }
+        });
+        //原生forEach return false 不能中止循环
+        arr.forEach(function(v,i,a){
+            console.log(v);
+            if(v == 3){
+                return false;
+            }
+        })
+    </script>
+    <script type="text">
+        //A&&A.B&&A.B.C 转化为Getter
+        //同步变量迭代取值器
+        var Getter = function(data,key){
+            if(!data)return undefined;
+            var result = data,
+            key = key.split('.');
+            for(var i=0;i<key.length;i++){
+                if(result[key[i]]!==undefined){
+                    result = result[key[i]];
+                } else {
+                    return undefined;
+                }
+            }
+            return result;
+        }
+
+        var data = {
+            a:{
+                b:{
+                    c:{
+                        d:1
+                    }
+                }
+            }
+        }
+        console.log(Getter(data,'a.b.c.d'));
+
+        //同步变量迭代赋值器
+        var Setter = function(data,key,value){
+            if(!data){
+                return false;
+            }
+            var result = data,
+                key = key.split('.');
+            for(var i=0;i<key.length-1;i++){
+                if(result[key[i]] === undefined){
+                    result[key[i]] = {}
+                }
+                if(!(result[key[i]] instanceof Object)){
+                    throw new Error(`data ${key.splice(0,i+1).join()} is not Object`);
+                }
+                result = result[key[i]];
+            }
+            return result[key[i]] = value;
+        }
+        var data = {};
+        Setter(data,'a.b.c',1)
+    </script>
+</body>
+</html>

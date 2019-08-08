@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>21-命令模式</title>
+</head>
+<body>
+    <div id="title">
+
+    </div>
+    <div id="product">
+
+    </div>
+    <script>
+       var viewCommand = (function(){
+           var tpl = {
+                product:`<div><img src="{#src#}"/><p>{#text#}</p></div>`,
+                title:`<div class="title"><div class="main"><h2>{#title#}</h2><p>{#tips#}</p></div></div>`
+            },
+            html = '';
+            function formateString(str,obj){
+                return str.replace(/\{#(\w+)#\}/g,function($,$1){
+                    console.log(arguments);
+                    return obj[$1];
+                });
+            }
+           var Action = {
+               create(data,view){
+                if(data.length){
+                    for (let i = 0; i < data.length; i++) {
+                        html+=formateString(tpl[view],data[i]);
+                    }
+                } else {
+                    html+=formateString(tpl[view],data);
+                }
+               },
+               display(container,data,view){
+                    if(data){
+                        this.create(data,view);
+                    }
+                    document.getElementById(container).innerHTML = html;
+                    html = '';
+               }
+           }
+           return function excute(msg){
+                msg.param = Object.prototype.toString.call(msg.param) === "[object Array]"?msg.param:[msg.param];
+                Action[msg.command].apply(Action,msg.param);
+           }
+       })();
+       var titleData = {
+           title:'夏日里的一片温馨',
+           tips:'暖暖的垃圾分类的骄傲法律'
+       }
+       viewCommand({
+           command:'display',
+           param:['title',titleData,'title']
+       });
+       viewCommand({
+           command:'display',
+           param:['product',[{src:'1.jpg',text:'野菊花'},{src:'2.jpg',text:'图菊花'}],'product']
+       })
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>33-参与者模式</title>
+</head>
+
+<body>
+       
+    <script>
+      if(true){//Function.prototype.bind === undefined
+          Function.prototype.bind = function(context){
+            var Slice = Array.prototype.slice,
+                args = Slice.call(arguments,1),
+                me = this;
+            return function(){
+                var addArgs = Slice.call(arguments),
+                    allArgs = args.concat(addArgs);
+                return me.apply(context,allArgs);
+            }
+          }
+      }
+
+      function A(){
+          console.log(arguments);
+      }
+
+      var B = A.bind(null,1);
+
+      B(2);
+    </script>
+</body>
+</html>

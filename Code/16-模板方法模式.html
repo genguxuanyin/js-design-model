@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>16-模板方法模式</title>
+    <style lang="css">
+        .alert{
+            border: 1px solid black;
+        }
+        .a-close{
+            width: 10px;
+            height: 10px;
+            background-color: blue;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        //实现不同类型的弹窗功能
+        //封装绑定事件
+        function addEvent(dom,type,fn){
+            if(dom.addEventListener){
+                dom.addEventListener(type,fn,false);
+            } else if(dom.attachEvent){
+                dom.attachEvent(`on${type}`,fn);
+            } else {
+                dom[`on${type}`] = fn;
+            }
+        }
+        var Alert = function(data){
+            if(!data)return;
+            this.content = data.content;
+            this.panel = document.createElement('div');
+            this.contentNode = document.createElement('p');
+            this.confirmBtn = document.createElement('span');
+            this.closeBtn = document.createElement('b');
+            this.panel.className = 'alert';
+            this.closeBtn.className = 'a-close';
+            this.confirmBtn.innerHTML = data.confirm || '确认';
+            this.contentNode.innerHTML = this.content;
+            this.success = data.success || function(){};
+            this.fail = data.fail || function(){};
+        }
+        Object.assign(Alert.prototype,{
+            init(){
+                this.panel.appendChild(this.closeBtn);
+                this.panel.appendChild(this.contentNode);
+                this.panel.appendChild(this.confirmBtn);
+                document.body.appendChild(this.panel);
+                this.bindEvent();
+                this.show();
+            },
+            bindEvent(){
+                var me = this;
+                addEvent(this.closeBtn,'click',function(){
+                    me.fail();
+                    me.hide();
+                });
+                addEvent(this.confirmBtn,'click',function(){
+                    me.success();
+                    me.hide();
+                });
+            },
+            hide(){
+                this.panel.style.display = 'none';
+            },
+            show(){
+                this.panel.style.display = 'block';
+            }
+        });
+
+        new Alert({
+            content:'content',
+            confirm:'confirm',
+            success:function(){
+                console.log('success');
+            },
+            fail: function(){
+                console.log('fail');
+            }
+        }).init();
+    </script>
+</body>
+</html>

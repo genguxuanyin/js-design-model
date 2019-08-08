@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>19-策略模式</title>
+</head>
+<body>
+    <script>
+        var InputStrategy = (function(){
+            var strategy = {
+                notNull(value){
+                    return /\s+/.test(value)?'请输入内容':'';
+                },
+                number(value){
+                    return /^\d+(\.\d+)?$/.test(value)?'':'请输入数字';
+                },
+                phone(value){
+                    return /^[1][3,4,5,7,8][0-9]{9}$/.test(value)? '':'请输入正确的手机号';
+                }
+            }
+            return {
+                check(type,value){
+                    value = value.replace(/^\s|\s$/g,'');
+                    return strategy[type]?strategy[type](value):'not';
+                },
+                addStrategy(type,fn){
+                    strategy[type] = fn;
+                }
+            }
+        })();
+
+        var result = InputStrategy.check('phone','18213917293');
+    </script>
+</body>
+</html>

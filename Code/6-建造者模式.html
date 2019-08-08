@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>6-建造者模式</title>
+</head>
+<body>
+    <script>
+        var Human = function(param){
+            this.skill = param && param.skill || '保密';
+            this.hobby = param && param.hobby || '保密';
+        }
+        Object.assign(Human.prototype,{
+            getSkill(){
+                return this.skill;
+            }
+        });
+
+        var Named = function(name){
+            var me = this;
+            (function(name,me){
+                me.wholeName = name;
+                if(~name.indexOf(' ')){//~a = -(a+1) 等价于 name.indexOf(' ')!=-1
+                    me.FirstName = name.slice(0, name.indexOf(' '));
+                    me.LastName = name.slice(name.indexOf(' '));
+                }
+            })(name,me);
+        }
+
+        var Work = function(work){
+            switch(work){
+                case 'code':
+                    this.work = '工程师';
+                    this.workDescript = '每天。。。';
+                    break;
+            }
+        }
+
+        var Person = function(name, work){
+            var _person = new Human();
+            _person.name = new Named(name);
+            _person.work = new Work(work);
+            return _person;
+        }
+
+        var person = new Person('xiao ming','code'); // 有new时，如果构造函数主动返回的是对象类型，则覆盖this
+
+        var F = function(name){
+            this.name = name;
+
+            //返回以下不覆盖this
+            // return 1;
+            // return '';
+            // return false;
+            // return true;
+            // return null;
+            // return undefined;
+            
+            //返回以下覆盖this
+            // return [];
+            // return {};
+            return function(){console.log(1)};
+        }
+        var f = new F(1);
+        f();
+    </script>
+</body>
+</html>

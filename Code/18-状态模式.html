@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>18-状态模式</title>
+</head>
+<body>
+    <script>
+        //超级玛丽
+       var MarryState = function(){
+           var _currentState = {},
+           states = {
+               jump(){
+                   console.log('jump');
+               },
+               move(){
+                   console.log('move');
+               },
+               shoot(){
+                   console.log('shoot');
+               },
+               squat(){
+                   console.log('squat');
+               }
+           }
+           var Action = {
+               changeState(){
+                   var arg = arguments;
+                   _currentState = {};
+                   if(arg.length){
+                       for (let i = 0; i < arg.length; i++) {
+                           _currentState[arg[i]] = true;
+                       }
+                   }
+                   return this;
+               },
+               goes(){
+                   console.log('触发一次');
+                   for (var state in _currentState) {
+                       if(_currentState[state]){
+                        states[state] && states[state]();
+                       }
+                   }
+                   return this;
+               }
+           }
+           return Action;
+       }
+
+       console.log(MarryState() === MarryState())
+       console.log(new MarryState() === new MarryState())
+
+       var marry = new MarryState();
+       marry.changeState('jump','shoot').goes().changeState('squat').goes();
+    </script>
+</body>
+</html>

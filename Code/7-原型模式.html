@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>7-原型模式</title>
+</head>
+<body>
+    <script>
+       var inherit = (function(){
+            var F = function(){};
+            return function(Origin, Target){
+                F.prototype = Origin.prototype;
+                Target.prototype = new F();
+                Target.prototype.constructor = Target;
+                Target.prototype.uber = Origin.prototype;
+            };
+        })();
+        var LoopImages = function(imgArr,container){
+            this.imagesArray = imgArr;
+            this.container = container;
+        }
+        Object.assign(LoopImages.prototype,{
+            createImage(){
+                console.log('LoopImages createImage function');
+            }
+        }); 
+        /*
+        LoopImages.prototype = { //这种写法会覆盖constructor,建议用assign（对象复制）
+            createImage(){
+                console.log('LoopImages createImage function');
+            }
+        }
+        */
+        var SlideLoopImg = function(imgArr,container){
+            LoopImages.call(this, imgArr, container);
+        }
+
+        SlideLoopImg.prototype = new LoopImages();
+
+        var SlideLoopImg1 = function(imgArr,container){
+            LoopImages.call(this, imgArr, container);
+        }
+
+        inherit(LoopImages,SlideLoopImg1);
+
+        var s = new SlideLoopImg([1,2],'footer');
+        var s1 = new SlideLoopImg1([1,2],'footer');
+
+    </script>
+</body>
+</html>
