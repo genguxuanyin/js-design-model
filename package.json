@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/genguxuanyin/js-design-model/issues"
   },
-  "homepage": "https://github.com/genguxuanyin/js-design-model#readme"
+  "homepage": "https://github.com/genguxuanyin/js-design-model#readme",
+  "dependencies": {
+    "genguxuanyin-localstorage": "^1.0.0"
+  }
 }
